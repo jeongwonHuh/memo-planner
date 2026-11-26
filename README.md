@@ -3,6 +3,10 @@
 메모 · Todo · 캘린더를 한 화면에서 쓰고 **서로 연결**하는 개인 생산성 웹앱입니다.
 "적고(메모) → 할 일로 바꾸고(Todo) → 날짜에 올리는(캘린더)" 흐름을 한 앱에서 끝내는 것이 목표입니다.
 
+### 🌐 [웹에서 바로 체험하기 → memo-planner-sigma.vercel.app](https://memo-planner-sigma.vercel.app)
+설치 없이 브라우저에서 메모 · Todo · 캘린더를 써 볼 수 있어요. 데이터는 내 브라우저에만 저장돼요.
+웹 체험 버전에서는 ✨ AI 기능이 꺼져 있어요. AI는 내려받아 실행할 때 쓸 수 있어요.
+
 > 국민대학교 AX-Startup 부트캠프 실습으로 Claude Code와 함께 만든 프로젝트입니다.
 > 기획 문서: [PRD.md](PRD.md) · AI 설계: [PLAN-2단계-AI.md](PLAN-2단계-AI.md)
 
