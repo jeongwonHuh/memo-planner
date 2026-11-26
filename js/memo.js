@@ -19,7 +19,7 @@ const MemoView = (() => {
 
   function listHtml() {
     const list = sorted(currentTag);
-    if (!list.length) return U.emptyMsg(currentTag ? '이 태그의 메모가 없어요.' : '아직 메모가 없어요.<br>"+ 새 메모"를 눌러 시작하세요.');
+    if (!list.length) return `<div class="mochi-empty">${Mochi.svg(88)}<p>${currentTag ? '이 태그의 메모가 없어요.' : '아직 메모가 없어요.<br>"+ 새 메모"를 눌러 시작하세요.'}</p></div>`;
     return `<ul class="memo-list">${list.map(m => {
       const text = Store.memoText(m);
       return `<li class="${m.id === currentId ? 'on' : ''}"><a class="memo-link" href="${memoHref(m.id)}">
@@ -70,7 +70,7 @@ const MemoView = (() => {
         <button data-act="check" title="체크박스 줄 넣기 (할 일 목록에도 추가돼요)">☐ 체크</button>
         <button data-act="toTodo" class="accent" title="드래그로 선택한 문장을 할 일로 보내기">→ 할 일로 보내기</button>
         <span class="ai-menu-wrap">
-          <button data-act="aiMenu" class="ai-btn" title="AI 도우미 (요금 발생)">✨ AI ▾</button>
+          <button data-act="aiMenu" class="ai-btn" title="AI 도우미 (${U.esc(AI.costNow())})">✨ AI ▾</button>
           <div class="ai-menu" hidden>
             <button data-ai="summarize">📝 3줄 요약</button>
             <button data-ai="extract_todos">✅ 할 일 찾기</button>
@@ -100,11 +100,13 @@ const MemoView = (() => {
         <div class="tag-chips only-mobile" data-tag-chips></div>
         <div data-list>${listHtml()}</div>
       </section>
-      <section class="memo-editor-pane">${m ? editorHtml(m) : `<div class="empty big">${id ? '메모를 찾을 수 없어요.' : '왼쪽에서 메모를 고르거나<br>"+ 새 메모"를 눌러 시작하세요.'}</div>`}</section>
+      <section class="memo-editor-pane">${m ? editorHtml(m) : `<div class="empty-stage"><div class="mochi-stage" data-mochi3d></div><p>${id ? '메모를 찾을 수 없어요.' : '왼쪽에서 메모를 고르거나<br>"+ 새 메모"를 눌러 시작하세요.'}</p></div>`}</section>
     </div>`;
     const page = root.firstElementChild;
     page.querySelector('[data-new-memo]').onclick = newMemo;
     if (m) bindEditor(page, m);
+    const stage = page.querySelector('[data-mochi3d]');
+    if (stage) Mochi.mount3d(stage, 300); // 빈 화면의 3D 모찌 (마우스를 따라보고, 드래그하면 돌아요)
   }
 
   function newMemo() {
@@ -148,7 +150,15 @@ const MemoView = (() => {
       const b = e.target.closest('button'); if (!b) return;
       // ✨ AI 메뉴 (A-01, A-02, A-04, A-06)
       const menu = tb.querySelector('.ai-menu');
-      if (b.dataset.act === 'aiMenu') { menu.hidden = !menu.hidden; return; }
+      if (b.dataset.act === 'aiMenu') {
+        menu.hidden = !menu.hidden;
+        if (!menu.hidden) {
+          // 좁은 화면에서 왼쪽 밖으로 잘리지 않게: 잘리면 버튼의 왼쪽에 맞춰 열어요
+          menu.style.left = ''; menu.style.right = '';
+          if (menu.getBoundingClientRect().left < 8) { menu.style.right = 'auto'; menu.style.left = '0'; }
+        }
+        return;
+      }
       if (b.dataset.ai) { menu.hidden = true; AI.memoAction(b.dataset.ai, tb.querySelector('.ai-btn')); return; }
       ensureFocus();
       if (b.dataset.block) document.execCommand('formatBlock', false, `<${b.dataset.block}>`);

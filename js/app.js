@@ -260,8 +260,12 @@ Modals.settings = function () {
     <div>
       <div class="side-label">✨ AI 도우미</div>
       <p class="hint" style="margin:0 0 6px" data-ai-status>연결 상태 확인 중…</p>
-      <p class="hint" style="margin:0">✨ 버튼을 누를 때만 그 내용이 Anthropic(Claude)으로 전송되고, <b>사용할 때마다 요금이 발생</b>해요.
+      <p class="hint" style="margin:0" data-ai-cost>✨ 버튼을 누를 때만 그 내용이 Anthropic(Claude)으로 전송돼요.
       다른 사람의 개인정보·비밀번호가 담긴 내용은 보내지 마세요.</p>
+      <div data-shutdown-box hidden style="margin-top:10px">
+        <button type="button" class="btn" data-shutdown>⏻ 프로그램 끝내기</button>
+        <p class="hint" style="margin:6px 0 0">MemoMate 프로그램(서버)을 완전히 끕니다. 저장된 메모 데이터는 그대로 남아 있어요.</p>
+      </div>
     </div>
     <div>
       <div class="side-label">백업</div>
@@ -275,16 +279,27 @@ Modals.settings = function () {
     </div>`;
   const back = Modal.open({ title: '⚙ 설정 · 백업', body, actions: [{ label: '닫기', onClick: Modal.close }] });
 
+  // 설정 창을 열 때마다 AI 연결 상태를 새로 확인해요 (AI를 부르는 게 아니라 상태만 보는 거예요)
   AI.status(true).then(st => {
     const el = back.querySelector('[data-ai-status]'); if (!el) return;
-    const msg = st.ready ? `🟢 연결됨 · 모델 ${U.esc(st.model)}`
-      : st.reason === 'key' ? '⚪ 꺼짐: API 키가 아직 없어요'
-        : st.reason === 'package' ? '⚪ 꺼짐: AI 패키지가 설치되지 않았어요'
-        : st.reason === 'web' ? '⚪ 웹 체험 버전에서는 AI를 쓸 수 없어요'
-          : '⚪ 꺼짐: AI를 지원하는 서버로 열리지 않았어요';
-    el.innerHTML = msg + (st.ready ? '' : ' · <a href="#" data-ai-howto>설정 방법 보기</a>');
-    const how = el.querySelector('[data-ai-howto]');
-    if (how) how.onclick = e => { e.preventDefault(); AI.setupGuide(st.reason); };
+    const costEl = back.querySelector('[data-ai-cost]');
+    const base = '✨ 버튼을 누를 때만 그 내용이 Anthropic(Claude)으로 전송돼요. 다른 사람의 개인정보·비밀번호가 담긴 내용은 보내지 마세요.';
+    if (st.ready) {
+      el.textContent = st.engine === 'cli' ? '✅ Claude CLI로 연결됨(로그인 사용)' : '✅ API 키로 연결됨';
+      if (costEl) costEl.innerHTML = base + '<br><b>사용 시 ' + U.esc(AI.costLine(st)) + '</b>';
+    } else if (st.reason === 'web') {
+      el.textContent = '웹 체험판에서는 AI가 꺼져 있어요';
+      if (costEl) costEl.hidden = true;
+    } else {
+      el.innerHTML = (st.reason === 'server' ? '⚠️ AI 연결 안 됨 (서버에 연결하지 못했어요)' : '⚠️ AI 연결 안 됨') + ' — <a href="#" data-ai-howto>설정 방법 보기</a>';
+      el.querySelector('[data-ai-howto]').onclick = e => { e.preventDefault(); AI.setupGuide(st.reason, st); };
+      if (costEl) costEl.innerHTML = base;
+    }
+    // 단독 프로그램(서버가 끌 수 있다고 알려 줄 때)에서만 끝내기 버튼을 보여요
+    if (st.canShutdown) {
+      const box = back.querySelector('[data-shutdown-box]'); box.hidden = false;
+      box.querySelector('[data-shutdown]').onclick = () => App.shutdown();
+    }
   });
 
   back.querySelector('[data-theme-seg]').addEventListener('click', e => {
@@ -356,6 +371,23 @@ const App = {
     const raw = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
     const [name, ...rest] = raw.split('/');
     return { name: name || 'today', arg: rest.join('/') };
+  },
+  // 프로그램 끝내기: 한 번 묻고, 서버에 종료를 요청한 뒤 전체 화면 안내를 보여요
+  async shutdown() {
+    if (!confirm('MemoMate 프로그램을 끝낼까요?\n\n저장된 메모·할 일·일정은 그대로 남아 있어요.\n다시 쓰려면 프로그램을 다시 실행하면 돼요.')) return;
+    let ok = false;
+    try {
+      const r = await fetch('/api/shutdown', { method: 'POST', headers: { 'X-Memo-App': '1' } });
+      const j = await r.json().catch(() => ({}));
+      ok = r.ok && j.ok === true;
+    } catch (e) { ok = false; }
+    if (!ok) { U.toast('프로그램을 끝내지 못했어요. 터미널 창이나 프로그램 창을 직접 닫아 주세요.'); return; }
+    Modal.close();
+    const el = document.createElement('div');
+    el.className = 'shutdown-screen';
+    el.setAttribute('role', 'alert');
+    el.innerHTML = '<div><h2>프로그램을 종료했어요</h2><p>이 탭은 닫아도 돼요.</p><p class="hint">저장된 메모·할 일·일정 데이터는 그대로 남아 있어요. 다시 쓰려면 프로그램을 다시 실행하세요.</p></div>';
+    document.body.appendChild(el);
   },
   go(hash) { if (location.hash === hash) App.refresh(); else location.hash = hash; },
   refresh() {

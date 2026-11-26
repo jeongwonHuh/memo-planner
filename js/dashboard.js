@@ -16,6 +16,7 @@ const Dashboard = {
         <div><div class="eyebrow">오늘</div><h2>${U.label(today)}</h2></div>
         <div class="quick">
           <button class="btn only-mobile" data-open-settings aria-label="설정 · 백업">⚙</button>
+          <button class="btn ai-btn" data-quick="chat">💬 대화로 추가</button>
           <button class="btn" data-quick="memo">+ 메모</button>
           <button class="btn" data-quick="todo">+ 할 일</button>
           <button class="btn primary" data-quick="event">+ 일정</button>
@@ -29,7 +30,7 @@ const Dashboard = {
           </div>
           <div data-brief>${AI.briefingText()
             ? `<p class="ai-brief">${U.esc(AI.briefingText())}</p>`
-            : '<p class="hint" style="margin:0">버튼을 누르면 AI가 오늘 일정과 할 일을 보고 무엇부터 하면 좋을지 제안해요. (AI 사용 시 요금 발생)</p>'}</div>
+            : `<p class="hint" style="margin:0">버튼을 누르면 AI가 오늘 일정과 할 일을 보고 무엇부터 하면 좋을지 제안해요. (<span data-brief-cost>${U.esc(AI.costLine(null).replace(/\.$/, ''))}</span>)</p>`}</div>
         </section>
         <section class="card">
           <h3>📅 오늘 일정 <span class="count">${evs.length}</span></h3>
@@ -49,9 +50,12 @@ const Dashboard = {
     </div>`;
 
     const page = root.firstElementChild;
+    // 연결 방식(CLI/API)을 알면 요금 문구를 정확하게 바꿔요. (AI를 부르는 게 아니라 상태만 확인해요)
+    AI.status().then(st => { const el = page.querySelector('[data-brief-cost]'); if (el && st.ready) el.textContent = AI.costLine(st).replace(/\.$/, ''); });
     page.querySelector('[data-ai-brief]').onclick = e => AI.runBriefing(e.currentTarget, page.querySelector('[data-brief]')); // A-05
     page.querySelector('.quick').addEventListener('click', e => {
       const b = e.target.closest('[data-quick]'); if (!b) return;
+      if (b.dataset.quick === 'chat') AI.openChat(); // A-07
       if (b.dataset.quick === 'memo') { const m = Store.createMemo(); App.go('#/memos/' + m.id); }
       if (b.dataset.quick === 'todo') Modals.todo({ due: today });
       if (b.dataset.quick === 'event') Modals.event({ date: today });

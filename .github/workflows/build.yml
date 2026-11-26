@@ -1,0 +1,37 @@
+# Windows용 MemoMate 프로그램(zip)을 GitHub에서 만들어 주는 설정
+# 실행: GitHub 저장소 > Actions > "Build Windows app" > Run workflow (또는 v1.0.0 같은 태그를 올리면 자동)
+# 결과: 실행이 끝난 페이지 아래 Artifacts 에서 MemoMate-windows 다운로드
+name: Build Windows app
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build (onedir)
+        run: python -m PyInstaller --noconfirm --clean memomate.spec
+
+      - name: Zip
+        shell: pwsh
+        run: Compress-Archive -Path dist/MemoMate -DestinationPath MemoMate-windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MemoMate-windows
+          path: MemoMate-windows.zip

@@ -15,6 +15,12 @@
 !/시작하기.command
 !/시작하기.bat
 !/AI키설정하기.command
+!/requirements.txt
+!/memomate.spec
+!/build_mac.command
+!/.github/
+!/.github/workflows/
+!/.github/workflows/build.yml
 !/css/
 !/css/**
 !/js/

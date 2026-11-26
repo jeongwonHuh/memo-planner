@@ -8,13 +8,17 @@
     // 저장해 둔 테마(밝게/어둡게)를 화면이 그려지기 전에 먼저 적용 (깜빡임 방지)
     try { var t = localStorage.getItem('memoapp:theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
+  <!-- 글꼴: 인터넷이 안 되면 컴퓨터 기본 글꼴로 대신 보여요 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="app">
     <!-- 왼쪽 메뉴 (휴대폰에서는 아래쪽 탭) -->
     <aside class="sidebar">
-      <div class="brand">📒 메모 플래너</div>
+      <div class="brand"><span data-brand-mochi></span>메모 플래너</div>
       <nav class="nav">
         <a href="#/today" data-nav="today"><span class="ico">🏠</span><span class="lbl">오늘</span></a>
         <a href="#/memos" data-nav="memos"><span class="ico">📝</span><span class="lbl">메모</span></a>
@@ -40,12 +44,16 @@
   <div id="modalRoot"></div>
 
   <script src="js/store.js"></script>
+  <script src="js/mochi.js"></script>
   <script src="js/app.js"></script>
   <script src="js/memo.js"></script>
   <script src="js/todo.js"></script>
   <script src="js/calendar.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/ai.js"></script>
-  <script>App.init();</script>
+  <script>
+    document.querySelector('[data-brand-mochi]').innerHTML = Mochi.svg(30); // 로고 옆 작은 모찌
+    App.init();
+  </script>
 </body>
 </html>
