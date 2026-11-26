@@ -6,6 +6,25 @@
 > 국민대학교 AX-Startup 부트캠프 실습으로 Claude Code와 함께 만든 프로젝트입니다.
 > 기획 문서: [PRD.md](PRD.md) · AI 설계: [PLAN-2단계-AI.md](PLAN-2단계-AI.md)
 
+![오늘 대시보드](docs/screenshots/01-dashboard.jpg)
+
+## 화면 미리보기
+
+| 메모 편집 (제목 단계 · 형광펜 · 취소선 · 체크박스) | 캘린더 (일정 · 마감 할 일 · 날짜 메모) |
+|---|---|
+| ![메모 편집 화면](docs/screenshots/02-memo.jpg) | ![캘린더 월간 보기](docs/screenshots/03-calendar.jpg) |
+| **Todo (우선순위 · 마감일 · 원본 메모 연결)** | **✨ AI 할 일 찾기 (미리보기 후 선택해서 추가)** |
+| ![Todo 목록](docs/screenshots/04-todo.jpg) | ![AI 할 일 찾기 미리보기](docs/screenshots/05-ai-todos.jpg) |
+
+<details>
+<summary>🌙 다크 모드</summary>
+
+![다크 모드 메모 화면](docs/screenshots/06-dark-mode.jpg)
+
+</details>
+
+> 스크린샷은 가상의 예시 데이터로 찍었어요. AI 화면은 예시 응답으로 띄운 화면 예시입니다.
+
 ## 주요 기능
 
 ### 1단계 (AI 없이 동작)
