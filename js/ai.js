@@ -7,7 +7,11 @@ const AI = (() => {
   const CONSENT_KEY = 'memoapp:ai-consent';
   let cached = null; // { ready, reason, model }
 
+  // 웹에 배포된 버전(Vercel 등)에서는 AI를 끔: API 키 보호·요금 문제 때문
+  const IS_LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+
   async function status(force) {
+    if (!IS_LOCAL) return (cached = { ready: false, reason: 'web' });
     if (cached && !force) return cached;
     try {
       const r = await fetch('/api/ai/status', { cache: 'no-store' });
@@ -49,7 +53,12 @@ const AI = (() => {
   }
 
   function setupGuide(reason) {
-    const steps = reason === 'server'
+    const steps = reason === 'web'
+      ? `<p>웹 체험 버전에서는 ✨ AI 기능을 쓸 수 없어요. (API 키 보호와 요금 때문이에요)</p>
+         <ol><li>GitHub 저장소 <b>jeongwonHuh/memo-planner</b>에서 <b>Code → Download ZIP</b>으로 내려받으세요.</li>
+         <li>내 컴퓨터에서 <b>시작하기.command</b>(Windows는 시작하기.bat)로 실행하고, 내 API 키를 설정하면 AI를 쓸 수 있어요.</li></ol>
+         <p class="hint" style="margin-top:8px">메모·Todo·캘린더 기능은 이 웹 버전에서도 그대로 쓸 수 있어요. 데이터는 이 브라우저에만 저장돼요.</p>`
+      : reason === 'server'
       ? `<p>지금 화면은 AI를 지원하지 않는 방식으로 열려 있어요.</p>
          <ol><li>열려 있는 터미널 창을 닫아 기존 서버를 끄세요.</li>
          <li>폴더에서 <b>시작하기.command</b>(Windows는 시작하기.bat)를 더블클릭해 다시 여세요.</li></ol>`

@@ -280,6 +280,7 @@ Modals.settings = function () {
     const msg = st.ready ? `🟢 연결됨 · 모델 ${U.esc(st.model)}`
       : st.reason === 'key' ? '⚪ 꺼짐: API 키가 아직 없어요'
         : st.reason === 'package' ? '⚪ 꺼짐: AI 패키지가 설치되지 않았어요'
+        : st.reason === 'web' ? '⚪ 웹 체험 버전에서는 AI를 쓸 수 없어요'
           : '⚪ 꺼짐: AI를 지원하는 서버로 열리지 않았어요';
     el.innerHTML = msg + (st.ready ? '' : ' · <a href="#" data-ai-howto>설정 방법 보기</a>');
     const how = el.querySelector('[data-ai-howto]');

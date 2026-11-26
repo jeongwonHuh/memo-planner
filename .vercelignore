@@ -1,0 +1,6 @@
+# Vercel 웹 배포에는 화면 파일만 올립니다.
+# server.py는 내 컴퓨터용 서버라서 Vercel에서 실행되면 안 돼요. (AI 키 보호)
+/*
+!/index.html
+!/css
+!/js
