@@ -105,7 +105,7 @@ Python이나 터미널 없이 **더블클릭만으로** 실행하는 단독 프�
 
 **현재 상태 (솔직하게)**
 - **Mac 앱**: Apple 칩(arm64) Mac에서 만들어 직접 실행해 확인했어요. 화면 · AI 연결 · 종료 버튼 · 두 번 실행 · 파일 비공개가 정상이었어요. Intel Mac은 확인하지 못했어요.
-- **Windows exe**: GitHub에서 만들도록 설정(`.github/workflows/build.yml`)만 해 두었고, **실제로 실행해 본 결과는 아직 확인하지 못했어요.**
+- **Windows exe**: GitHub의 Windows 서버에서 만들기(`.github/workflows/build.yml`)는 **성공**했고, 만들어진 zip 안에 `MemoMate.exe`와 화면 파일이 들어 있는 것까지 확인했어요. 다만 **Windows 컴퓨터에서 실제로 켜 본 것은 아직 아니에요.** 처음 켜 보시면 결과를 알려 주세요.
 
 **프로그램 만드는 방법**
 - **Mac**: `build_mac.command`를 더블클릭하면 몇 분 뒤 `dist/MemoMate.app`이 만들어져요. (인터넷 필요, 패키지는 폴더 안 `.venv`에만 설치돼요.)

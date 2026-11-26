@@ -43,6 +43,7 @@ const AI = (() => {
 
   // 요금 문구: 연결 방식(engine)에 따라 달라져요. cli = Claude 구독, api = 종량 요금
   function costLine(st) {
+    if (!IS_LOCAL || (st && st.reason === 'web')) return '웹 체험판에서는 AI를 쓸 수 없어요. 내 컴퓨터 앱에서 쓸 수 있어요.';
     if (st && st.engine === 'cli') return '내 Claude 구독 사용량에서 차감돼요.';
     if (st && st.engine === 'api') return 'API 요금이 발생해요.';
     return '내 Claude 구독 사용량이 쓰이거나(로그인 방식) API 요금이 발생해요(키 방식).';
@@ -94,7 +95,8 @@ const AI = (() => {
     if (reason === 'web') {
       steps = `<p>웹 체험 버전에서는 ✨ AI 기능을 쓸 수 없어요. (로그인·API 키 보호 때문이에요)</p>
          <ol><li>GitHub 저장소 <b>jeongwonHuh/memo-planner</b>에서 <b>Code → Download ZIP</b>으로 내려받으세요.</li>
-         <li>내 컴퓨터에서 <b>시작하기.command</b>(Windows는 시작하기.bat)로 실행하면 AI를 쓸 수 있어요.</li></ol>
+         <li><b>Mac</b>: 압축을 푼 폴더에서 <b>시작하기.command</b>를 더블클릭하세요. <b>Windows</b>: 압축을 푼 뒤(ZIP 파일 우클릭 → 압축 풀기) 폴더 안의 <b>시작하기.bat</b>을 더블클릭하세요. (Python 3가 설치돼 있어야 해요)</li>
+         <li>앱이 열리면 설정(⚙)의 안내에 따라 Claude CLI 로그인이나 API 키로 AI를 켤 수 있어요.</li></ol>
          <p class="hint" style="margin-top:8px">메모·Todo·캘린더 기능은 이 웹 버전에서도 그대로 쓸 수 있어요. 데이터는 이 브라우저에만 저장돼요.</p>`;
     } else if (reason === 'server') {
       steps = `<p>지금 화면은 AI를 지원하지 않는 방식으로 열려 있어요.</p>
@@ -116,7 +118,7 @@ const AI = (() => {
          <p style="margin-top:8px"><b>방법 1: Claude CLI로 로그인</b> (Claude 유료 요금제 사용)</p>
          <ol>${cliInstall}${cliLogin(false)}${retry}</ol>${apiWay}${warn}`;
     }
-    Modal.open({ title: '✨ AI 설정이 필요해요', body: `<div class="ai-guide">${steps}</div>`, actions: [{ label: '닫기', onClick: Modal.close }] });
+    Modal.open({ title: reason === 'web' ? '✨ AI는 내 컴퓨터 앱에서 쓸 수 있어요' : '✨ AI 설정이 필요해요', body: `<div class="ai-guide">${steps}</div>`, actions: [{ label: '닫기', onClick: Modal.close }] });
   }
 
   // 버튼을 누른 뒤의 공통 흐름: 설정 확인 → 동의 → "생각 중…" → 실행
